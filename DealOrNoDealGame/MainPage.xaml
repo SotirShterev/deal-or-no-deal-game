@@ -1,0 +1,68 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:DealOrNoDealGame"
+             x:Class="DealOrNoDealGame.MainPage"
+             Title="Deal or no deal">
+
+    <ContentPage.Resources>
+        <local:BooleanToTextConverter x:Key="BooleanToTextConverter" />
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    </ContentPage.Resources>
+
+    <Grid Padding="0">
+        <!-- Row definitions -->
+        <Grid.RowDefinitions>
+            <!-- First row for the player's selected box -->
+            <RowDefinition Height="Auto" />
+            <!-- Second row for the CollectionView -->
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Display the player's selected box at the bottom of the screen -->
+        <StackLayout Grid.Row="0" Orientation="Horizontal" 
+                 HorizontalOptions="Center" 
+                 VerticalOptions="Center" 
+                 Margin="10">
+            <Label Text="Your Selected Box:" 
+               FontSize="20" 
+               HorizontalOptions="Center" 
+               VerticalOptions="Center" />
+            <!-- Display the selected box number -->
+            <Button Text="{Binding PlayerBox.DisplayText}" 
+                BackgroundColor="LightGreen"
+                FontSize="18"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="FillAndExpand"
+                Padding="15" />
+        </StackLayout>
+
+        <!-- CollectionView for boxes -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Boxes}" SelectionMode="None" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="4" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+                        <Button Text="{Binding DisplayText}" 
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectOrOpenBoxCommand}"
+                            CommandParameter="{Binding Number}"
+                            BackgroundColor="{Binding BackgroundColor}"
+                            Padding="0"
+                            FontSize="12"
+                            HorizontalOptions="FillAndExpand"
+                            VerticalOptions="FillAndExpand"
+                            LineBreakMode="WordWrap" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Text="Deal or No Deal" 
+        Command="{Binding DealOrNoDealCommand}" 
+        HorizontalOptions="Center" 
+        VerticalOptions="End" 
+        IsVisible="{Binding IsDealButtonVisible}" />
+    </Grid>
+
+</ContentPage>
