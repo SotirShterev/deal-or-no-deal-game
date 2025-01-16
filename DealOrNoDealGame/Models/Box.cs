@@ -43,7 +43,7 @@ public class Box : INotifyPropertyChanged
         get
         {
             // Use predefined Color values instead of strings
-            return OpenedValue.HasValue ? Color.FromRgba("#f71d56") : Color.FromRgba("#000000");
+            return OpenedValue.HasValue ? Color.FromRgba("#f71d56") : Color.FromRgba("#f07e06");
         }
     }
 

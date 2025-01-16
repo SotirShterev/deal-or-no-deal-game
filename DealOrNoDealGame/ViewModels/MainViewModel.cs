@@ -14,8 +14,21 @@ public class MainViewModel : INotifyPropertyChanged
 {
     public ObservableCollection<Box> Boxes { get; set; }
 
-    private List<double> boxValues = new List<double> { 0.01, 0.10, 0.50, 1, 2, 5, 10, 50, 100, 250, 500, 750,
+    private List<double> initialBoxValues = new List<double> { 0.01, 0.10, 0.50, 1, 2, 5, 10, 50, 100, 250, 500, 750,
         1000, 1500, 2500, 5000, 7500, 10000, 12500, 15000, 20000, 25000, 50000, 100000};
+
+    private List<double> values = new List<double> { 0.01, 0.10, 0.50, 1, 2, 5, 10, 50, 100, 250, 500, 750,
+        1000, 1500, 2500, 5000, 7500, 10000, 12500, 15000, 20000, 25000, 50000, 100000};
+
+    public List<double> Values
+    {
+        get => values;
+        set
+        {
+            values = value;
+            OnPropertyChanged(nameof(Values));
+        }
+    }
 
     private bool _isPlayerBoxSelected;
     public bool IsPlayerBoxSelected
@@ -74,6 +87,110 @@ public class MainViewModel : INotifyPropertyChanged
             }
         }
     }
+    private string _bankOfferText;
+    public string BankOfferText
+    {
+        get => _bankOfferText;
+        set
+        {
+            _bankOfferText = value;
+            OnPropertyChanged(nameof(BankOfferText));
+        }
+    }
+
+    private bool _isBankOfferVisible;
+    public bool IsBankOfferVisible
+    {
+        get => _isBankOfferVisible;
+        set
+        {
+            _isBankOfferVisible = value;
+            OnPropertyChanged(nameof(IsBankOfferVisible));
+        }
+    }
+
+    private bool _isGameOver;
+    public bool IsGameOver
+    {
+        get => _isGameOver;
+        set
+        {
+            _isGameOver = value;
+            OnPropertyChanged(nameof(IsGameOver));
+        }
+    }
+
+    private string _gameResult;
+    public string GameResult
+    {
+        get => _gameResult;
+        set
+        {
+            _gameResult = value;
+            OnPropertyChanged(nameof(GameResult));
+        }
+    }
+
+    private bool _isSelectingNewBox;
+    public bool IsSelectingNewBox
+    {
+        get => _isSelectingNewBox;
+        set
+        {
+            _isSelectingNewBox = value;
+            OnPropertyChanged(nameof(IsSelectingNewBox));
+        }
+    }
+
+    private bool _isSwappingBox;
+    public bool IsSwappingBox
+    {
+        get => _isSwappingBox;
+        set
+        {
+            _isSwappingBox = value;
+            OnPropertyChanged(nameof(IsSwappingBox));
+        }
+    }
+
+    private double _bankOfferValue;
+    public double BankOfferValue
+    {
+        get => _bankOfferValue;
+        set
+        {
+            _bankOfferValue = value;
+            OnPropertyChanged(nameof(BankOfferValue));
+        }
+    }
+
+    private string remainingBoxes;
+    public string RemainingBoxes
+    {
+        get => remainingBoxes;
+        set
+        {
+            remainingBoxes = value;
+            OnPropertyChanged(nameof(RemainingBoxes));
+        }
+    }
+
+    private bool isRoundOver;
+    public bool IsRoundOver
+    {
+        get => isRoundOver;
+        set
+        {
+            if (isRoundOver != value)
+            {
+                isRoundOver = value;
+                OnPropertyChanged(nameof(IsRoundOver));
+            }
+        }
+    }
+
+    public ICommand DealCommand { get; }
+    public ICommand NoDealCommand { get; }
 
     private ICommand _dealOrNoDealCommand;
     public ICommand DealOrNoDealCommand => _dealOrNoDealCommand ??= new Command(DealOrNoDeal);
@@ -88,14 +205,57 @@ public class MainViewModel : INotifyPropertyChanged
         {
             var box = new Box { Number = i, Value = GetRandomValue() };
             Boxes.Add(box);
-            boxValues.Remove(box.Value);
+            initialBoxValues.Remove(box.Value);
         }
         SelectOrOpenBoxCommand = new Command<int>(SelectOrOpenBox);
+        DealCommand = new Command(HandleDeal);
+        NoDealCommand = new Command(HandleNoDeal);
+    }
+    private void HandleDeal()
+    {
+        if (BankOfferText.Contains("смяна"))
+        {
+            IsSwappingBox = true; // Enter box swapping mode
+            IsBankOfferVisible = false; // Hide the bank offer UI
+        }
+        else
+        {
+            EndGame(); // End the game with the bank offer value
+        }
+    }
+
+    private void HandleNoDeal()
+    {
+        IsBankOfferVisible = false; // Hide the bank offer
+        StartRound(); // Proceed to the next round
+    }
+
+    private void EndGame()
+    {
+        GameResult = $"Поздравления! Ти спечели: {BankOfferValue:C}";
+        IsGameOver = true;
+    }
+
+    private void StartBankOffer()
+    {
+        IsBankOfferVisible = true;
+
+        if (new Random().NextDouble() < 0.7) // Randomly choose the offer type
+        {
+            double averageValue = Boxes.Sum(b => b.Value) / Boxes.Count;
+            BankOfferValue = Math.Round(averageValue);
+            BankOfferText = $"Офертата на банката е: {BankOfferValue:C}";
+        }
+        else
+        {
+            BankOfferText = "Офертата на банката е: смяна на кутиите";
+        }
     }
 
     private async void SelectOrOpenBox(int boxNumber)
     {
-        if (!IsPlayerBoxSelected)
+        // Handle initial player box selection
+        if (!IsPlayerBoxSelected && !IsSwappingBox)
         {
             var selectedBox = Boxes.FirstOrDefault(b => b.Number == boxNumber);
             if (selectedBox != null)
@@ -105,7 +265,29 @@ public class MainViewModel : INotifyPropertyChanged
                 IsPlayerBoxSelected = true;
                 Boxes.Remove(selectedBox);
 
-                StartGame();
+                StartGame(); // Proceed to the game
+            }
+        }
+        // Handle box swapping during a bank offer
+        else if (IsSwappingBox)
+        {
+            var newPlayerBox = Boxes.FirstOrDefault(b => b.Number == boxNumber);
+            if (newPlayerBox != null)
+            {
+                // Return the previous player box to the list
+                PlayerBox.IsPlayerBox = false; // Reset the old player box flag
+                Boxes.Add(PlayerBox);
+
+                // Set the new player box
+                newPlayerBox.IsPlayerBox = true;
+                PlayerBox = newPlayerBox;
+
+                Boxes.Remove(newPlayerBox);
+
+                IsSwappingBox = false; // End the swapping process
+
+                // Proceed with the next steps after swapping
+                StartRound(); // Resume the game
             }
         }
         else
@@ -126,7 +308,7 @@ public class MainViewModel : INotifyPropertyChanged
 
                 Boxes.Remove(boxToOpen);
                 BoxesToOpen--;
-
+                RemainingBoxes = $"Кутии за отваряне: {BoxesToOpen}";
                 if (BoxesToOpen == 0)
                 {
                     EndRound();
@@ -143,6 +325,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     private void StartRound()
     {
+        isRoundOver = false;
         switch (RoundNumber)
         {
             case 1: BoxesToOpen = 6;
@@ -160,19 +343,22 @@ public class MainViewModel : INotifyPropertyChanged
             case 7: BoxesToOpen = 1;
                 break;
         }
+        RemainingBoxes = $"Кутии за отваряне: {BoxesToOpen}";
     }
 
     private void EndRound()
     {
+        isRoundOver = true;
         RoundNumber++;
+        StartBankOffer();
     }
 
     private double GetRandomValue()
     {
         Random random = new Random();
-        int randomIndex = random.Next(0, boxValues.Count);
+        int randomIndex = random.Next(0, initialBoxValues.Count);
 
-        return boxValues[randomIndex];
+        return initialBoxValues[randomIndex];
     }
 
     private void DealOrNoDeal()
