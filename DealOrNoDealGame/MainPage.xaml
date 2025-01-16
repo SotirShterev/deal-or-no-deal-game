@@ -10,29 +10,22 @@
     </ContentPage.Resources>
 
     <Grid Padding="0">
-        <!-- Row definitions -->
         <Grid.RowDefinitions>
-            <!-- First row for the player's selected box -->
             <RowDefinition Height="Auto" />
-            <!-- Second row for the CollectionView -->
             <RowDefinition Height="*" />
-            <!-- Third row for the list of box values -->
             <RowDefinition Height="*" />
-            <!-- Fourth row for the bank offer -->
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Display the player's selected box at the bottom of the screen -->
         <StackLayout Grid.Row="0" Orientation="Horizontal" 
                  HorizontalOptions="Center" 
                  VerticalOptions="Center" 
                  Margin="10"
                  IsVisible="{Binding IsGameOver, Converter={StaticResource InverseBooleanConverter}}">
             <Label Text="Вашата кутия:" 
-               FontSize="18" 
+               FontSize="16" 
                HorizontalOptions="Center" 
                VerticalOptions="Center" />
-            <!-- Display the selected box number -->
             <Button Text="{Binding PlayerBox.DisplayText}" 
                 BackgroundColor="#046A3C"
                 HorizontalOptions="FillAndExpand"
@@ -41,13 +34,12 @@
                 />
             <Label IsVisible="{Binding IsRoundOver, Converter={StaticResource InverseBooleanConverter}}"
                    Text="{Binding RemainingBoxes}"
-                   FontSize="18" 
+                   FontSize="16" 
                    HorizontalOptions="Center" 
                    VerticalOptions="Center"
                    Margin="10"/>
         </StackLayout>
 
-        <!-- CollectionView for boxes -->
         <CollectionView Grid.Row="1" ItemsSource="{Binding Boxes}" SelectionMode="None" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"
                         IsVisible="{Binding IsGameOver, Converter={StaticResource InverseBooleanConverter}}">
             <CollectionView.ItemsLayout>
@@ -74,7 +66,6 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <!-- List of box values -->
         <StackLayout Grid.Row="2" Padding="10" Orientation="Vertical"
              HorizontalOptions="Center" VerticalOptions="Center"
              IsVisible="{Binding IsGameOver, Converter={StaticResource InverseBooleanConverter}}">
@@ -89,17 +80,17 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Grid Padding="0" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
-                            <Button Text="{Binding .}" 
+                            <Button Text="{Binding Key}" 
                                     FontSize="9" 
                                     HorizontalOptions="Center" 
                                     VerticalOptions="Center"
-                                    BackgroundColor="Gold"
+                                    BackgroundColor="{Binding Value}"
                                     TextColor="Black"
                                     BorderWidth="1"
                                     BorderColor="Black"
                                     HeightRequest="40"
                                     WidthRequest="60"/>
-                         </Grid>
+                        </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
@@ -107,33 +98,32 @@
 
 
         <StackLayout Grid.Row="3" Padding="10" IsVisible="{Binding IsBankOfferVisible}">
-            <!-- Display the bank's offer -->
             <Label Text="{Binding BankOfferText}" 
                    FontSize="18" 
                    HorizontalOptions="Center" 
                    VerticalOptions="Center"
                    IsVisible="{Binding IsGameOver, Converter={StaticResource InverseBooleanConverter}}"/>
 
-            <!-- Deal and No Deal buttons -->
             <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Margin="10">
                 <Button Text="Сделка" 
                 Command="{Binding DealCommand}" 
                 BackgroundColor="#046A3C" 
                 FontSize="16"
+                TextColor="White"
                 IsVisible="{Binding IsGameOver, Converter={StaticResource InverseBooleanConverter}}"/>
                 <Button Text="Няма сделка" 
                 Command="{Binding NoDealCommand}" 
                 BackgroundColor="Red" 
                 FontSize="16"
+                TextColor="White"
                 IsVisible="{Binding IsGameOver, Converter={StaticResource InverseBooleanConverter}}"/>
             </StackLayout>
         </StackLayout>
         <StackLayout IsVisible="{Binding IsGameOver}" VerticalOptions="CenterAndExpand" HorizontalOptions="Center">
             <Label Text="{Binding GameResult}" FontSize="24" HorizontalOptions="Center" />
-            <Button Text="{Binding PlayerBox.DisplayText}" BackgroundColor="#046A3C" FontSize="18" />
+            <Button Text="{Binding PlayerBox.Value}" BackgroundColor="#046A3C" FontSize="18" TextColor="White" />
         </StackLayout>
 
     </Grid>
-    
 
 </ContentPage>

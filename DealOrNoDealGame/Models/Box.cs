@@ -12,15 +12,15 @@ public class Box : INotifyPropertyChanged
     public int Number { get; set; }
     public double Value { get; set; }
 
-    private double? _openedValue;
+    private double? openedValue;
     public double? OpenedValue
     {
-        get => _openedValue;
+        get => openedValue;
         set
         {
-            if (_openedValue != value)
+            if (openedValue != value)
             {
-                _openedValue = value;
+                openedValue = value;
                 OnPropertyChanged(nameof(OpenedValue));
                 OnPropertyChanged(nameof(DisplayText));
                 OnPropertyChanged(nameof(BackgroundColor));
@@ -42,7 +42,6 @@ public class Box : INotifyPropertyChanged
     {
         get
         {
-            // Use predefined Color values instead of strings
             return OpenedValue.HasValue ? Color.FromRgba("#f71d56") : Color.FromRgba("#f07e06");
         }
     }

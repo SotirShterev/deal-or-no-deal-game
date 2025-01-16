@@ -17,26 +17,43 @@ public class MainViewModel : INotifyPropertyChanged
     private List<double> initialBoxValues = new List<double> { 0.01, 0.10, 0.50, 1, 2, 5, 10, 50, 100, 250, 500, 750,
         1000, 1500, 2500, 5000, 7500, 10000, 12500, 15000, 20000, 25000, 50000, 100000};
 
-    private List<double> values = new List<double> { 0.01, 0.10, 0.50, 1, 2, 5, 10, 50, 100, 250, 500, 750,
-        1000, 1500, 2500, 5000, 7500, 10000, 12500, 15000, 20000, 25000, 50000, 100000};
-
-    public List<double> Values
-    {
-        get => values;
-        set
+    private Dictionary<double, Color> values = new Dictionary<double, Color>
         {
-            values = value;
-            OnPropertyChanged(nameof(Values));
-        }
-    }
+            { 0.01, Colors.Gold },
+            { 0.10, Colors.Gold },
+            { 0.50, Colors.Gold },
+            { 1, Colors.Gold },
+            { 2, Colors.Gold },
+            { 5, Colors.Gold },
+            { 10, Colors.Gold },
+            { 50, Colors.Gold },
+            { 100, Colors.Gold },
+            { 250, Colors.Gold },
+            { 500, Colors.Gold },
+            { 750, Colors.Gold },
+            { 1000, Colors.Gold },
+            { 1500, Colors.Gold },
+            { 2500, Colors.Gold },
+            { 5000, Colors.Gold },
+            { 7500, Colors.Gold },
+            { 10000, Colors.Gold },
+            { 12500, Colors.Gold },
+            { 15000, Colors.Gold },
+            { 20000, Colors.Gold },
+            { 25000, Colors.Gold },
+            { 50000, Colors.Gold },
+            { 100000, Colors.Gold }
+        };
 
-    private bool _isPlayerBoxSelected;
+    public List<KeyValuePair<double, Color>> Values => values.ToList();
+
+    private bool isPlayerBoxSelected;
     public bool IsPlayerBoxSelected
     {
-        get => _isPlayerBoxSelected;
+        get => isPlayerBoxSelected;
         set
         {
-            _isPlayerBoxSelected = value;
+            isPlayerBoxSelected = value;
             OnPropertyChanged(nameof(IsPlayerBoxSelected));
         }
     }
@@ -63,103 +80,90 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    private Box _playerBox;
+    private Box playerBox;
     public Box PlayerBox
     {
-        get => _playerBox;
+        get => playerBox;
         set
         {
-            _playerBox = value;
+            playerBox = value;
             OnPropertyChanged(nameof(PlayerBox));
         }
     }
 
-    private bool _isDealButtonVisible;
-    public bool IsDealButtonVisible
-    {
-        get => _isDealButtonVisible;
-        set
-        {
-            if (_isDealButtonVisible != value)
-            {
-                _isDealButtonVisible = value;
-                OnPropertyChanged(nameof(IsDealButtonVisible));
-            }
-        }
-    }
-    private string _bankOfferText;
+    private string bankOfferText;
     public string BankOfferText
     {
-        get => _bankOfferText;
+        get => bankOfferText;
         set
         {
-            _bankOfferText = value;
+            bankOfferText = value;
             OnPropertyChanged(nameof(BankOfferText));
         }
     }
 
-    private bool _isBankOfferVisible;
+    private bool isBankOfferVisible;
     public bool IsBankOfferVisible
     {
-        get => _isBankOfferVisible;
+        get => isBankOfferVisible;
         set
         {
-            _isBankOfferVisible = value;
+            isBankOfferVisible = value;
             OnPropertyChanged(nameof(IsBankOfferVisible));
         }
     }
 
-    private bool _isGameOver;
+    private bool isGameOver;
     public bool IsGameOver
     {
-        get => _isGameOver;
+        get => isGameOver;
         set
         {
-            _isGameOver = value;
+            isGameOver = value;
             OnPropertyChanged(nameof(IsGameOver));
         }
     }
 
-    private string _gameResult;
+    private string gameResult;
     public string GameResult
     {
-        get => _gameResult;
+        get => gameResult;
         set
         {
-            _gameResult = value;
+            gameResult = value;
             OnPropertyChanged(nameof(GameResult));
         }
     }
 
-    private bool _isSelectingNewBox;
+    private bool isSelectingNewBox;
     public bool IsSelectingNewBox
     {
-        get => _isSelectingNewBox;
+        get => isSelectingNewBox;
         set
         {
-            _isSelectingNewBox = value;
+            isSelectingNewBox = value;
             OnPropertyChanged(nameof(IsSelectingNewBox));
         }
     }
 
-    private bool _isSwappingBox;
+    private bool isSwappingBox;
     public bool IsSwappingBox
     {
-        get => _isSwappingBox;
+        get => isSwappingBox;
         set
         {
-            _isSwappingBox = value;
+            isSwappingBox = value;
             OnPropertyChanged(nameof(IsSwappingBox));
         }
     }
 
-    private double _bankOfferValue;
+    private double bankOfferValue;
     public double BankOfferValue
     {
-        get => _bankOfferValue;
+        get => bankOfferValue;
         set
         {
-            _bankOfferValue = value;
+            bankOfferValue = value;
             OnPropertyChanged(nameof(BankOfferValue));
         }
     }
@@ -189,11 +193,22 @@ public class MainViewModel : INotifyPropertyChanged
         }
     }
 
+    private Color valueColor = Color.FromRgba("#f8c21b");
+    public Color ValueColor
+    {
+        get => valueColor;
+        set
+        {
+            if (valueColor != value)
+            {
+                valueColor = value;
+                OnPropertyChanged(nameof(ValueColor));
+            }
+        }
+    }
+
     public ICommand DealCommand { get; }
     public ICommand NoDealCommand { get; }
-
-    private ICommand _dealOrNoDealCommand;
-    public ICommand DealOrNoDealCommand => _dealOrNoDealCommand ??= new Command(DealOrNoDeal);
 
     public ICommand SelectOrOpenBoxCommand { get; }
 
@@ -215,24 +230,30 @@ public class MainViewModel : INotifyPropertyChanged
     {
         if (BankOfferText.Contains("смяна"))
         {
-            IsSwappingBox = true; // Enter box swapping mode
-            IsBankOfferVisible = false; // Hide the bank offer UI
+            IsSwappingBox = true;
+            IsBankOfferVisible = false;
         }
         else
         {
-            EndGame(); // End the game with the bank offer value
+            GameResult = $"Поздравления! Ти спечели: {BankOfferValue:C}";
+            IsGameOver = true;
         }
     }
 
     private void HandleNoDeal()
     {
-        IsBankOfferVisible = false; // Hide the bank offer
-        StartRound(); // Proceed to the next round
+        IsBankOfferVisible = false;
+        if (RoundNumber == 8)
+        {
+            EndGame();
+        }
+        StartRound();
     }
 
-    private void EndGame()
+    private async void EndGame()
     {
-        GameResult = $"Поздравления! Ти спечели: {BankOfferValue:C}";
+        GameResult = $"Във вашата кутия има:";
+        await Task.Delay(5000);
         IsGameOver = true;
     }
 
@@ -240,7 +261,7 @@ public class MainViewModel : INotifyPropertyChanged
     {
         IsBankOfferVisible = true;
 
-        if (new Random().NextDouble() < 0.7) // Randomly choose the offer type
+        if (new Random().NextDouble() < 0.7)
         {
             double averageValue = Boxes.Sum(b => b.Value) / Boxes.Count;
             BankOfferValue = Math.Round(averageValue);
@@ -254,7 +275,6 @@ public class MainViewModel : INotifyPropertyChanged
 
     private async void SelectOrOpenBox(int boxNumber)
     {
-        // Handle initial player box selection
         if (!IsPlayerBoxSelected && !IsSwappingBox)
         {
             var selectedBox = Boxes.FirstOrDefault(b => b.Number == boxNumber);
@@ -265,29 +285,25 @@ public class MainViewModel : INotifyPropertyChanged
                 IsPlayerBoxSelected = true;
                 Boxes.Remove(selectedBox);
 
-                StartGame(); // Proceed to the game
+                StartGame();
             }
         }
-        // Handle box swapping during a bank offer
         else if (IsSwappingBox)
         {
             var newPlayerBox = Boxes.FirstOrDefault(b => b.Number == boxNumber);
             if (newPlayerBox != null)
             {
-                // Return the previous player box to the list
-                PlayerBox.IsPlayerBox = false; // Reset the old player box flag
+                PlayerBox.IsPlayerBox = false;
                 Boxes.Add(PlayerBox);
 
-                // Set the new player box
                 newPlayerBox.IsPlayerBox = true;
                 PlayerBox = newPlayerBox;
 
                 Boxes.Remove(newPlayerBox);
 
-                IsSwappingBox = false; // End the swapping process
+                IsSwappingBox = false;
 
-                // Proceed with the next steps after swapping
-                StartRound(); // Resume the game
+                StartRound();
             }
         }
         else
@@ -300,7 +316,13 @@ public class MainViewModel : INotifyPropertyChanged
             if (boxToOpen != null)
             {
                 boxToOpen.OpenedValue = boxToOpen.Value;
-                    
+
+                if (values.ContainsKey(boxToOpen.Value))
+                {
+                    values[boxToOpen.Value] = Colors.Brown;
+                    OnPropertyChanged(nameof(Values));
+                }
+
                 boxToOpen.OnPropertyChanged(nameof(Box.DisplayText));
                 boxToOpen.OnPropertyChanged(nameof(Box.BackgroundColor));
 
@@ -309,15 +331,15 @@ public class MainViewModel : INotifyPropertyChanged
                 Boxes.Remove(boxToOpen);
                 BoxesToOpen--;
                 RemainingBoxes = $"Кутии за отваряне: {BoxesToOpen}";
+
+
                 if (BoxesToOpen == 0)
                 {
                     EndRound();
-                    IsDealButtonVisible = true;
                 }
             }
         }
     }
-
     private void StartGame()
     {
         StartRound();
@@ -359,13 +381,6 @@ public class MainViewModel : INotifyPropertyChanged
         int randomIndex = random.Next(0, initialBoxValues.Count);
 
         return initialBoxValues[randomIndex];
-    }
-
-    private void DealOrNoDeal()
-    {
-        StartRound();
-
-        IsDealButtonVisible = false;
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
