@@ -232,6 +232,11 @@ public class MainViewModel : INotifyPropertyChanged
         {
             IsSwappingBox = true;
             IsBankOfferVisible = false;
+
+            if (RoundNumber == 8)
+            {
+                EndGame();
+            }
         }
         else
         {
@@ -253,7 +258,7 @@ public class MainViewModel : INotifyPropertyChanged
     private async void EndGame()
     {
         GameResult = $"Във вашата кутия има:";
-        await Task.Delay(5000);
+        await Task.Delay(3000);
         IsGameOver = true;
     }
 
